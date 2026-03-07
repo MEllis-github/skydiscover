@@ -38,8 +38,14 @@ _TEMPLATES_DIR = str(Path(__file__).parent / "templates")
 _TEXT_LANGUAGES = {"text", "prompt", "text/plain"}
 
 _KNOWN_TEMPLATE_VARS = {
-    "current_program", "metrics", "previous_attempts", "other_context_programs",
-    "improvement_areas", "language", "timeout_warning", "search_guidance",
+    "current_program",
+    "metrics",
+    "previous_attempts",
+    "other_context_programs",
+    "improvement_areas",
+    "language",
+    "timeout_warning",
+    "search_guidance",
 }
 
 _PLACEHOLDER_RE = re.compile(r"\{(\w+)\}")
@@ -91,6 +97,7 @@ class DefaultContextBuilder(ContextBuilder):
         self.system_template_override = None
         self.user_template_override = None
         self.template_manager = TemplateManager(_TEMPLATES_DIR, self.context_config.template_dir)
+        self._system_message_warned = False
 
     def set_templates(
         self, system_template: Optional[str] = None, user_template: Optional[str] = None
@@ -202,10 +209,8 @@ class DefaultContextBuilder(ContextBuilder):
             return "full_rewrite_prompt_opt_user_message"
         return "full_rewrite_user_message"
 
-    _system_message_validated = False
-
     def _get_system_message(self) -> str:
-        """Substitutes {placeholder} patterns from environment variables."""
+        """Return system message, substituting {placeholder} patterns from env vars."""
         if self.system_template_override:
             return self.template_manager.get_template(self.system_template_override)
         system_msg = self.context_config.system_message
@@ -214,8 +219,8 @@ class DefaultContextBuilder(ContextBuilder):
 
         system_msg = _substitute_placeholders(system_msg)
 
-        if not DefaultContextBuilder._system_message_validated:
-            DefaultContextBuilder._system_message_validated = True
+        if not self._system_message_warned:
+            self._system_message_warned = True
             _warn_unsubstituted_placeholders(system_msg)
 
         return system_msg

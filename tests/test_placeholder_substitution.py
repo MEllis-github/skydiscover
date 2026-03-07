@@ -2,11 +2,9 @@
 
 import logging
 
-import pytest
-
 from skydiscover.context_builder.default.builder import (
-    _EnvFormatDict,
     _KNOWN_TEMPLATE_VARS,
+    _EnvFormatDict,
     _substitute_placeholders,
     _warn_unsubstituted_placeholders,
 )
