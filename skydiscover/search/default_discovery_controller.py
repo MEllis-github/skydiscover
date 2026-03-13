@@ -347,6 +347,7 @@ class DiscoveryController:
                 if feedback:
                     prompt = self.feedback_reader.apply_feedback(prompt)
 
+            llm_time = 0.0
             llm_start = time.time()
             result = await self._call_llm(prompt["system"], prompt["user"])
             llm_time = time.time() - llm_start
@@ -473,6 +474,7 @@ class DiscoveryController:
                         )
 
                 try:
+                    llm_time = 0.0
                     llm_start = time.time()
                     if self.config.language == "image":
                         child_id = str(uuid.uuid4())
