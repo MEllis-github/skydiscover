@@ -19,6 +19,7 @@ Configuration options (via GEPANativeDatabaseConfig):
 """
 
 import logging
+import time
 import uuid
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
@@ -321,10 +322,13 @@ class GEPANativeController(DiscoveryController):
         merge_prompt = self._build_merge_prompt(prog_a, prog_b)
 
         try:
+            llm_start = time.time()
             llm_result = await self.llms.generate(
                 system_message=merge_prompt["system"],
                 messages=[{"role": "user", "content": merge_prompt["user"]}],
             )
+            llm_time = time.time() - llm_start
+            logger.info(f"Iteration {iteration}: Merge LLM call completed in {llm_time:.2f}s")
         except Exception as e:
             logger.warning(f"Merge LLM call failed: {e}")
             return
